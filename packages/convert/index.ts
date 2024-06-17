@@ -1,5 +1,5 @@
 /**
- * @description 火星坐标系 - GCJ-02 地球坐标系 - WGS84 百度坐标系 - BD-09
+ * 火星坐标系 - GCJ-02 地球坐标系 - WGS84 百度坐标系 - BD-09
  */
 
 // 定义一些常量
@@ -10,6 +10,11 @@ const PI = 3.1415926535897932384626;
 const a = 6378245.0;
 // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
 const ee = 0.00669342162296594323;
+
+export interface PositionLatLng {
+    latitude: number;
+    longitude: number;
+}
 
 /**
  * @description 经度转换
@@ -74,7 +79,10 @@ function outOfChina(longitude: string | number, latitude: string | number): bool
  * @param bdLongitude
  * @param bdLatitude
  */
-export function bd09ToGcj02(bdLongitude: string | number, bdLatitude: string | number) {
+export function bd09ToGcj02(
+    bdLongitude: string | number,
+    bdLatitude: string | number
+): PositionLatLng {
     const bdLng = Number(bdLongitude);
     const bdLat = Number(bdLatitude);
     const x = bdLng - 0.0065;
@@ -84,8 +92,8 @@ export function bd09ToGcj02(bdLongitude: string | number, bdLatitude: string | n
     const gcLng = z * Math.cos(theta);
     const gcLat = z * Math.sin(theta);
     return {
-        lng: gcLng,
-        lat: gcLat,
+        longitude: gcLng,
+        latitude: gcLat,
     };
 }
 
@@ -96,7 +104,10 @@ export function bd09ToGcj02(bdLongitude: string | number, bdLatitude: string | n
  * @param gcLatitude
  * @returns {*[]}
  */
-export function gcj02ToBd09(gcLongitude: string | number, gcLatitude: string | number) {
+export function gcj02ToBd09(
+    gcLongitude: string | number,
+    gcLatitude: string | number
+): PositionLatLng {
     const gcLng = Number(gcLongitude);
     const gcLat = Number(gcLatitude);
     const z = Math.sqrt(gcLng * gcLng + gcLat * gcLat) + 0.00002 * Math.sin(gcLat * xPI);
@@ -104,8 +115,8 @@ export function gcj02ToBd09(gcLongitude: string | number, gcLatitude: string | n
     const bdLng = z * Math.cos(theta) + 0.0065;
     const bdLat = z * Math.sin(theta) + 0.006;
     return {
-        lng: bdLng,
-        lat: bdLat,
+        longitude: bdLng,
+        latitude: bdLat,
     };
 }
 
@@ -115,11 +126,17 @@ export function gcj02ToBd09(gcLongitude: string | number, gcLatitude: string | n
  * @param gcLongitude
  * @param gcLatitude
  */
-export function gcj02ToWgs84(gcLongitude: string | number, gcLatitude: string | number) {
+export function gcj02ToWgs84(
+    gcLongitude: string | number,
+    gcLatitude: string | number
+): PositionLatLng {
     const lat = Number(gcLatitude);
     const lng = Number(gcLongitude);
     if (outOfChina(lng, lat)) {
-        return [lng, lat];
+        return {
+            longitude: lng,
+            latitude: lat,
+        };
     } else {
         let dlat = transformLat(lng - 105.0, lat - 35.0);
         let dlng = transformLng(lng - 105.0, lat - 35.0);
@@ -132,8 +149,8 @@ export function gcj02ToWgs84(gcLongitude: string | number, gcLatitude: string | 
         const nlat = lat + dlat;
         const nlng = lng + dlng;
         return {
-            lng: lng * 2 - nlng,
-            lat: lat * 2 - nlat,
+            longitude: lng * 2 - nlng,
+            latitude: lat * 2 - nlat,
         };
     }
 }
@@ -144,11 +161,17 @@ export function gcj02ToWgs84(gcLongitude: string | number, gcLatitude: string | 
  * @param wgLongitude
  * @param wgLatitude
  */
-export function wgs84ToGcj02(wgLongitude: string | number, wgLatitude: string | number) {
+export function wgs84ToGcj02(
+    wgLongitude: string | number,
+    wgLatitude: string | number
+): PositionLatLng {
     const lat = Number(wgLatitude);
     const lng = Number(wgLongitude);
     if (outOfChina(lng, lat)) {
-        return [lng, lat];
+        return {
+            longitude: lng,
+            latitude: lat,
+        };
     } else {
         let dlat = transformLat(lng - 105.0, lat - 35.0);
         let dlng = transformLng(lng - 105.0, lat - 35.0);
@@ -161,8 +184,8 @@ export function wgs84ToGcj02(wgLongitude: string | number, wgLatitude: string | 
         const jclat = lat + dlat;
         const jclng = lng + dlng;
         return {
-            lng: jclat,
-            lat: jclng,
+            longitude: jclat,
+            latitude: jclng,
         };
     }
 }
