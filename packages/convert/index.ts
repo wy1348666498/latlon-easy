@@ -1,20 +1,16 @@
+import { isPointInPolygon } from '@/other';
+// eslint-disable-next-line import/extensions
+import chinaJson from '@/china.json';
+import { EARTH_RADIUS, PI, type PositionLatLng } from '@/common';
+
 /**
  * 火星坐标系 - GCJ-02 地球坐标系 - WGS84 百度坐标系 - BD-09
  */
 
 // 定义一些常量
-// eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-const xPI = (3.14159265358979324 * 3000.0) / 180.0;
-// eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-const PI = 3.1415926535897932384626;
-const a = 6378245.0;
+const xPI = (PI * 3000.0) / 180.0;
 // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
 const ee = 0.00669342162296594323;
-
-export interface PositionLatLng {
-    latitude: number;
-    longitude: number;
-}
 
 /**
  * @description 经度转换
@@ -68,8 +64,23 @@ function transformLng(longitude: string | number, latitude: string | number): nu
 function outOfChina(longitude: string | number, latitude: string | number): boolean {
     const lat = Number(latitude);
     const lng = Number(longitude);
-    // 纬度 3.86~53.55, 经度 73.66~135.05
-    return !(lng > 73.66 && lng < 135.05 && lat > 3.86 && lat < 53.55);
+    const regionAll = chinaJson.features[0].geometry.coordinates;
+
+    for (let i = 0; i < regionAll.length; i++) {
+        const region = regionAll[i];
+        for (let j = 0; j < region.length; j++) {
+            const path = region[j];
+            if (
+                isPointInPolygon(
+                    { latitude: lat, longitude: lng },
+                    path.map(e => ({ latitude: e[1], longitude: e[0] }))
+                )
+            ) {
+                return false;
+            }
+        }
+    }
+    return false;
 }
 
 /**
@@ -144,8 +155,8 @@ export function gcj02ToWgs84(
         let magic = Math.sin(radlat);
         magic = 1 - ee * magic * magic;
         const sqrtmagic = Math.sqrt(magic);
-        dlat = (dlat * 180.0) / (((a * (1 - ee)) / (magic * sqrtmagic)) * PI);
-        dlng = (dlng * 180.0) / ((a / sqrtmagic) * Math.cos(radlat) * PI);
+        dlat = (dlat * 180.0) / (((EARTH_RADIUS * (1 - ee)) / (magic * sqrtmagic)) * PI);
+        dlng = (dlng * 180.0) / ((EARTH_RADIUS / sqrtmagic) * Math.cos(radlat) * PI);
         const nlat = lat + dlat;
         const nlng = lng + dlng;
         return {
@@ -179,8 +190,8 @@ export function wgs84ToGcj02(
         let magic = Math.sin(radlat);
         magic = 1 - ee * magic * magic;
         const sqrtmagic = Math.sqrt(magic);
-        dlat = (dlat * 180.0) / (((a * (1 - ee)) / (magic * sqrtmagic)) * PI);
-        dlng = (dlng * 180.0) / ((a / sqrtmagic) * Math.cos(radlat) * PI);
+        dlat = (dlat * 180.0) / (((EARTH_RADIUS * (1 - ee)) / (magic * sqrtmagic)) * PI);
+        dlng = (dlng * 180.0) / ((EARTH_RADIUS / sqrtmagic) * Math.cos(radlat) * PI);
         const jclat = lat + dlat;
         const jclng = lng + dlng;
         return {
