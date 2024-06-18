@@ -1,2 +1,8 @@
 export { bd09ToGcj02, gcj02ToBd09, gcj02ToWgs84, wgs84ToGcj02 } from './convert/index';
-export { isLongitude, isLatitude, isCoordinate, getDistance } from './other/index';
+export {
+    isLongitude,
+    isLatitude,
+    isCoordinate,
+    getDistance,
+    isPointInPolygon,
+} from './other/index';

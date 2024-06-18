@@ -1,7 +1,4 @@
-import { isPointInPolygon } from '@/other';
-// eslint-disable-next-line import/extensions
-import chinaJson from '@/china.json';
-import { EARTH_RADIUS, PI, type PositionLatLng } from '@/common';
+import { EARTH_RADIUS, PI, EE, type PositionLatLng } from '@/common';
 
 /**
  * 火星坐标系 - GCJ-02 地球坐标系 - WGS84 百度坐标系 - BD-09
@@ -9,8 +6,6 @@ import { EARTH_RADIUS, PI, type PositionLatLng } from '@/common';
 
 // 定义一些常量
 const xPI = (PI * 3000.0) / 180.0;
-// eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-const ee = 0.00669342162296594323;
 
 /**
  * @description 经度转换
@@ -56,147 +51,83 @@ function transformLng(longitude: string | number, latitude: string | number): nu
 }
 
 /**
- * @description 判断是否在国内，不在国内则不做偏移
- * @param longitude
- * @param latitude
- * @returns {boolean}
- */
-function outOfChina(longitude: string | number, latitude: string | number): boolean {
-    const lat = Number(latitude);
-    const lng = Number(longitude);
-    const regionAll = chinaJson.features[0].geometry.coordinates;
-
-    for (let i = 0; i < regionAll.length; i++) {
-        const region = regionAll[i];
-        for (let j = 0; j < region.length; j++) {
-            const path = region[j];
-            if (
-                isPointInPolygon(
-                    { latitude: lat, longitude: lng },
-                    path.map(e => ({ latitude: e[1], longitude: e[0] }))
-                )
-            ) {
-                return false;
-            }
-        }
-    }
-    return false;
-}
-
-/**
  * 百度坐标系 (BD-09) 与 火星坐标系 (GCJ-02) 的转换
  * 即 百度 转 谷歌、高德
- * @returns {*[]}
- * @param bdLongitude
- * @param bdLatitude
+ * @returns PositionLatLng
+ * @param longitude 经度
+ * @param latitude 纬度
  */
-export function bd09ToGcj02(
-    bdLongitude: string | number,
-    bdLatitude: string | number
-): PositionLatLng {
-    const bdLng = Number(bdLongitude);
-    const bdLat = Number(bdLatitude);
-    const x = bdLng - 0.0065;
-    const y = bdLat - 0.006;
+export function bd09ToGcj02(longitude: string | number, latitude: string | number): PositionLatLng {
+    const lng = Number(longitude);
+    const lat = Number(latitude);
+    const x = lng - 0.0065;
+    const y = lat - 0.006;
     const z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * xPI);
     const theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * xPI);
     const gcLng = z * Math.cos(theta);
     const gcLat = z * Math.sin(theta);
-    return {
-        longitude: gcLng,
-        latitude: gcLat,
-    };
+    return { longitude: gcLng, latitude: gcLat };
 }
 
 /**
  * 火星坐标系 (GCJ-02) 与百度坐标系 (BD-09) 的转换
  * 即 谷歌、高德 转 百度
- * @param gcLongitude
- * @param gcLatitude
- * @returns {*[]}
+ * @returns PositionLatLng
+ * @param longitude 经度
+ * @param latitude 纬度
  */
-export function gcj02ToBd09(
-    gcLongitude: string | number,
-    gcLatitude: string | number
-): PositionLatLng {
-    const gcLng = Number(gcLongitude);
-    const gcLat = Number(gcLatitude);
-    const z = Math.sqrt(gcLng * gcLng + gcLat * gcLat) + 0.00002 * Math.sin(gcLat * xPI);
-    const theta = Math.atan2(gcLat, gcLng) + 0.000003 * Math.cos(gcLng * xPI);
+export function gcj02ToBd09(longitude: string | number, latitude: string | number): PositionLatLng {
+    const lng = Number(longitude);
+    const lat = Number(latitude);
+    const z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * xPI);
+    const theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * xPI);
     const bdLng = z * Math.cos(theta) + 0.0065;
     const bdLat = z * Math.sin(theta) + 0.006;
-    return {
-        longitude: bdLng,
-        latitude: bdLat,
-    };
+    return { longitude: bdLng, latitude: bdLat };
 }
 
 /**
- * GCJ-02 转换为 WGS-84
- * @returns {*[]}
- * @param gcLongitude
- * @param gcLatitude
+ * @description GCJ-02 转换为 WGS-84 只有中国大陆的坐标才需要调用此方法
+ * @returns PositionLatLng
+ * @param longitude 经度
+ * @param latitude 纬度
  */
 export function gcj02ToWgs84(
-    gcLongitude: string | number,
-    gcLatitude: string | number
+    longitude: string | number,
+    latitude: string | number
 ): PositionLatLng {
-    const lat = Number(gcLatitude);
-    const lng = Number(gcLongitude);
-    if (outOfChina(lng, lat)) {
-        return {
-            longitude: lng,
-            latitude: lat,
-        };
-    } else {
-        let dlat = transformLat(lng - 105.0, lat - 35.0);
-        let dlng = transformLng(lng - 105.0, lat - 35.0);
-        const radlat = (lat / 180.0) * PI;
-        let magic = Math.sin(radlat);
-        magic = 1 - ee * magic * magic;
-        const sqrtmagic = Math.sqrt(magic);
-        dlat = (dlat * 180.0) / (((EARTH_RADIUS * (1 - ee)) / (magic * sqrtmagic)) * PI);
-        dlng = (dlng * 180.0) / ((EARTH_RADIUS / sqrtmagic) * Math.cos(radlat) * PI);
-        const nlat = lat + dlat;
-        const nlng = lng + dlng;
-        return {
-            longitude: lng * 2 - nlng,
-            latitude: lat * 2 - nlat,
-        };
-    }
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    let dLat = transformLat(lng - 105.0, lat - 35.0);
+    let dLng = transformLng(lng - 105.0, lat - 35.0);
+    const radLat = (lat / 180.0) * PI;
+    let magic = Math.sin(radLat);
+    magic = 1 - EE * magic * magic;
+    const sqrtMagic = Math.sqrt(magic);
+    dLat = (dLat * 180.0) / (((EARTH_RADIUS * (1 - EE)) / (magic * sqrtMagic)) * PI);
+    dLng = (dLng * 180.0) / ((EARTH_RADIUS / sqrtMagic) * Math.cos(radLat) * PI);
+    return { longitude: lng * 2 - (lng + dLng), latitude: lat * 2 - (lat + dLat) };
 }
 
 /**
- * WGS-84 转 GCJ-02
- * @returns {*[]}
- * @param wgLongitude
- * @param wgLatitude
+ * @description WGS-84 转 GCJ-02 只有中国大陆的坐标才需要调用此方法
+ * @returns PositionLatLng
+ * @param longitude 经度
+ * @param latitude 纬度
  */
 export function wgs84ToGcj02(
-    wgLongitude: string | number,
-    wgLatitude: string | number
+    longitude: string | number,
+    latitude: string | number
 ): PositionLatLng {
-    const lat = Number(wgLatitude);
-    const lng = Number(wgLongitude);
-    if (outOfChina(lng, lat)) {
-        return {
-            longitude: lng,
-            latitude: lat,
-        };
-    } else {
-        let dlat = transformLat(lng - 105.0, lat - 35.0);
-        let dlng = transformLng(lng - 105.0, lat - 35.0);
-        const radlat = (lat / 180.0) * PI;
-        let magic = Math.sin(radlat);
-        magic = 1 - ee * magic * magic;
-        const sqrtmagic = Math.sqrt(magic);
-        dlat = (dlat * 180.0) / (((EARTH_RADIUS * (1 - ee)) / (magic * sqrtmagic)) * PI);
-        dlng = (dlng * 180.0) / ((EARTH_RADIUS / sqrtmagic) * Math.cos(radlat) * PI);
-        const jclat = lat + dlat;
-        const jclng = lng + dlng;
-        return {
-            longitude: jclat,
-            latitude: jclng,
-        };
-    }
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    let dLat = transformLat(lng - 105.0, lat - 35.0);
+    let dLng = transformLng(lng - 105.0, lat - 35.0);
+    const radLat = (lat / 180.0) * PI;
+    let magic = Math.sin(radLat);
+    magic = 1 - EE * magic * magic;
+    const sqrtMagic = Math.sqrt(magic);
+    dLat = (dLat * 180.0) / (((EARTH_RADIUS * (1 - EE)) / (magic * sqrtMagic)) * PI);
+    dLng = (dLng * 180.0) / ((EARTH_RADIUS / sqrtMagic) * Math.cos(radLat) * PI);
+    return { longitude: lng + dLng, latitude: lat + dLat };
 }
