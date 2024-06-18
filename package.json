@@ -2,33 +2,20 @@
   "name": "latlon-easy",
   "description": "经纬度工具集合",
   "version": "0.0.1",
-  "author": "weiyang<1348666498@qq.com>",
+  "author": "WeiYang<2116466260@qq.com>",
   "keywords": [
-    "utils",
     "typescript",
     "rollup",
-    "jest",
     "esm",
     "umd",
     "cjs"
   ],
-  "homepage": "",
   "repository": {
     "type": "git",
-    "url": ""
-  },
-  "bugs": {
-    "url": ""
+    "url": "https://github.com/wy1348666498/latlon-easy.git"
   },
   "private": false,
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
   "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
-  },
   "browserslist": [
     "last 2 versions",
     "> 5%",
@@ -54,9 +41,7 @@
       "prettier --write"
     ]
   },
-  "files": [
-    "lib"
-  ],
+  "files": ["lib","README.md","LICENSE"],
   "types": "lib/index.d.ts",
   "devDependencies": {
     "@babel/core": "^7.23.3",
