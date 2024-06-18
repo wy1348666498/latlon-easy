@@ -1,7 +1,7 @@
 {
   "name": "latlon-easy",
   "description": "经纬度工具集合",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "WeiYang<2116466260@qq.com>",
   "keywords": [
     "typescript",
@@ -41,7 +41,11 @@
       "prettier --write"
     ]
   },
-  "files": ["lib","README.md","LICENSE"],
+  "files": [
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
   "types": "lib/index.d.ts",
   "devDependencies": {
     "@babel/core": "^7.23.3",
