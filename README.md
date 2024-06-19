@@ -15,13 +15,13 @@
 #### ESM
 
 ```javascript
-import { defer, messageCenter, TaskQueue, Request } from "latlon-easy";
+import { bd09ToGcj02, getBearing } from "latlon-easy";
 ```
 
 #### CJS
 
 ```javascript
-const { defer, messageCenter, TaskQueue } = require("latlon-easy");
+const { bd09ToGcj02, getBearing } = require("latlon-easy");
 ```
 
 ## 使用
