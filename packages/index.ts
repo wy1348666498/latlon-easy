@@ -4,5 +4,6 @@ export {
     isLatitude,
     isCoordinate,
     getDistance,
+    getBearing,
     isPointInPolygon,
 } from './other/index';

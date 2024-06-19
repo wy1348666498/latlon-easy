@@ -131,7 +131,7 @@ export function isPointInPolygon(
 }
 
 /**
- * @description 获取两点之间的直线距离
+ * @description 计算两点之间的直线距离
  * @param startPoint 起点的经纬度
  * @param endPoint 终点的经纬度
  * @returns {number} 距离 单位：米
@@ -150,4 +150,25 @@ export function getDistance(startPoint: PositionLatLng, endPoint: PositionLatLng
             )
         );
     return s * EARTH_RADIUS;
+}
+
+/**
+ * @description 计算两个点之间的方位角
+ * @param point1 起点的经纬度
+ * @param point2 终点的经纬度
+ * @returns {number} 方位角，单位：度
+ */
+export function getBearing(point1: PositionLatLng, point2: PositionLatLng): number {
+    const toRad = (angle: number) => (angle * PI) / 180.0;
+    const toDeg = (angle: number) => (angle * 180.0) / PI;
+
+    const lat1 = toRad(point1.latitude);
+    const lat2 = toRad(point2.latitude);
+    const deltaLng = toRad(point2.longitude - point1.longitude);
+
+    const y = Math.sin(deltaLng) * Math.cos(lat2);
+    const x =
+        Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLng);
+
+    return (toDeg(Math.atan2(y, x)) + 360) % 360; // 确保方位角在0-360度之间
 }
