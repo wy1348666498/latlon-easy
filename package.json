@@ -1,7 +1,7 @@
 {
   "name": "latlon-easy",
   "description": "经纬度工具集合",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "WeiYang<2116466260@qq.com>",
   "keywords": [
     "typescript",
