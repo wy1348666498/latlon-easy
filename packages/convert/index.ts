@@ -1,4 +1,4 @@
-import { EARTH_RADIUS, PI, EE, type PositionLatLng } from '@/common';
+import { EARTH_RADIUS, PI, EE, type PositionLatLng } from '../common';
 
 /**
  * 火星坐标系 - GCJ-02 地球坐标系 - WGS84 百度坐标系 - BD-09

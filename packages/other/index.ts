@@ -1,4 +1,4 @@
-import { EARTH_RADIUS, PI, type PositionLatLng } from '@/common';
+import { EARTH_RADIUS, PI, type PositionLatLng } from '../common';
 
 /**
  * @description 验证是否是经度
