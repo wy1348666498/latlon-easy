@@ -25,46 +25,50 @@ const { bd09ToGcj02, getBearing } = require("latlon-easy");
 ```
 
 ## 使用
-## `bd09ToGcj02(longitude, latitude)`
+## `bd09ToGcj02(longitude, latitude, decimals)`
 
 将百度 BD-09 坐标系的坐标转换为 GCJ-02（火星）坐标系。
 
 - **参数：**
     - `longitude`：BD-09 坐标系中的经度。
     - `latitude`：BD-09 坐标系中的纬度。
+    - `decimals`：保留小数位数，默认值为 -1 表示不处理
 - **返回值：** 包含 GCJ-02 坐标系中经度和纬度的对象。
 
 ---
 
-## `gcj02ToBd09(longitude, latitude)`
+## `gcj02ToBd09(longitude, latitude, decimals)`
 
 将 GCJ-02（火星）坐标系的坐标转换为百度 BD-09 坐标系。
 
 - **参数：**
     - `longitude`：GCJ-02 坐标系中的经度。
     - `latitude`：GCJ-02 坐标系中的纬度。
+    - `decimals`：保留小数位数，默认值为 -1 表示不处理
 - **返回值：** 包含 BD-09 坐标系中经度和纬度的对象。
 
 ---
 
-## `gcj02ToWgs84(longitude, latitude)`
+## `gcj02ToWgs84(longitude, latitude, decimals)`
 
 将 GCJ-02（火星）坐标系的坐标转换为 WGS-84 坐标系。
 
 - **参数：**
     - `longitude`：GCJ-02 坐标系中的经度。
     - `latitude`：GCJ-02 坐标系中的纬度。
+    - `decimals`：保留小数位数，默认值为 -1 表示不处理
 - **返回值：** 包含 WGS-84 坐标系中经度和纬度的对象。
 
 ---
 
-## `wgs84ToGcj02(longitude, latitude)`
+## `wgs84ToGcj02(longitude, latitude, decimals)`
 
 将 WGS-84 坐标系的坐标转换为 GCJ-02（火星）坐标系。
 
 - **参数：**
     - `longitude`：WGS-84 坐标系中的经度。
     - `latitude`：WGS-84 坐标系中的纬度。
+    - `decimals`：保留小数位数，默认值为 -1 表示不处理
 - **返回值：** 包含 GCJ-02 坐标系中经度和纬度的对象。
 
 ---

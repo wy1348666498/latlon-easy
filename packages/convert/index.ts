@@ -1,4 +1,4 @@
-import { EARTH_RADIUS, PI, EE, type PositionLatLng } from '../common';
+import { EARTH_RADIUS, PI, EE, type PositionLatLng, truncateDecimals } from '../common';
 
 /**
  * 火星坐标系 - GCJ-02 地球坐标系 - WGS84 百度坐标系 - BD-09
@@ -51,13 +51,17 @@ function transformLng(longitude: string | number, latitude: string | number): nu
 }
 
 /**
- * 百度坐标系 (BD-09) 与 火星坐标系 (GCJ-02) 的转换
- * 即 百度 转 谷歌、高德
- * @returns PositionLatLng
+ * @description 百度坐标系 (BD-09) 与 火星坐标系 (GCJ-02) 的转换 即 百度 转 谷歌、高德
  * @param longitude 经度
  * @param latitude 纬度
+ * @param decimals 保留小数位数，默认值为 -1 表示不处理
+ * @returns PositionLatLng
  */
-export function bd09ToGcj02(longitude: string | number, latitude: string | number): PositionLatLng {
+export function bd09ToGcj02(
+    longitude: string | number,
+    latitude: string | number,
+    decimals: number = -1
+): PositionLatLng {
     const lng = Number(longitude);
     const lat = Number(latitude);
     const x = lng - 0.0065;
@@ -66,35 +70,47 @@ export function bd09ToGcj02(longitude: string | number, latitude: string | numbe
     const theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * xPI);
     const gcLng = z * Math.cos(theta);
     const gcLat = z * Math.sin(theta);
-    return { longitude: gcLng, latitude: gcLat };
+    return {
+        longitude: truncateDecimals(gcLng, decimals),
+        latitude: truncateDecimals(gcLat, decimals),
+    };
 }
 
 /**
- * 火星坐标系 (GCJ-02) 与百度坐标系 (BD-09) 的转换
- * 即 谷歌、高德 转 百度
- * @returns PositionLatLng
+ * @description 火星坐标系 (GCJ-02) 与百度坐标系 (BD-09) 的转换 即 谷歌、高德 转 百度
  * @param longitude 经度
  * @param latitude 纬度
+ * @param decimals 保留小数位数，默认值为 -1 表示不处理
+ * @returns PositionLatLng
  */
-export function gcj02ToBd09(longitude: string | number, latitude: string | number): PositionLatLng {
+export function gcj02ToBd09(
+    longitude: string | number,
+    latitude: string | number,
+    decimals: number = -1
+): PositionLatLng {
     const lng = Number(longitude);
     const lat = Number(latitude);
     const z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * xPI);
     const theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * xPI);
     const bdLng = z * Math.cos(theta) + 0.0065;
     const bdLat = z * Math.sin(theta) + 0.006;
-    return { longitude: bdLng, latitude: bdLat };
+    return {
+        longitude: truncateDecimals(bdLng, decimals),
+        latitude: truncateDecimals(bdLat, decimals),
+    };
 }
 
 /**
  * @description GCJ-02 转换为 WGS-84 只有中国大陆的坐标才需要调用此方法
- * @returns PositionLatLng
  * @param longitude 经度
  * @param latitude 纬度
+ * @param decimals 保留小数位数，默认值为 -1 表示不处理
+ * @returns PositionLatLng
  */
 export function gcj02ToWgs84(
     longitude: string | number,
-    latitude: string | number
+    latitude: string | number,
+    decimals: number = -1
 ): PositionLatLng {
     const lat = Number(latitude);
     const lng = Number(longitude);
@@ -106,18 +122,26 @@ export function gcj02ToWgs84(
     const sqrtMagic = Math.sqrt(magic);
     dLat = (dLat * 180.0) / (((EARTH_RADIUS * (1 - EE)) / (magic * sqrtMagic)) * PI);
     dLng = (dLng * 180.0) / ((EARTH_RADIUS / sqrtMagic) * Math.cos(radLat) * PI);
-    return { longitude: lng * 2 - (lng + dLng), latitude: lat * 2 - (lat + dLat) };
+    const rLng = lng * 2 - (lng + dLng);
+    const rLat = lat * 2 - (lat + dLat);
+
+    return {
+        longitude: truncateDecimals(rLng, decimals),
+        latitude: truncateDecimals(rLat, decimals),
+    };
 }
 
 /**
  * @description WGS-84 转 GCJ-02 只有中国大陆的坐标才需要调用此方法
- * @returns PositionLatLng
  * @param longitude 经度
  * @param latitude 纬度
+ * @param decimals 保留小数位数，默认值为 -1 表示不处理
+ * @returns PositionLatLng
  */
 export function wgs84ToGcj02(
     longitude: string | number,
-    latitude: string | number
+    latitude: string | number,
+    decimals: number = -1
 ): PositionLatLng {
     const lat = Number(latitude);
     const lng = Number(longitude);
@@ -129,5 +153,11 @@ export function wgs84ToGcj02(
     const sqrtMagic = Math.sqrt(magic);
     dLat = (dLat * 180.0) / (((EARTH_RADIUS * (1 - EE)) / (magic * sqrtMagic)) * PI);
     dLng = (dLng * 180.0) / ((EARTH_RADIUS / sqrtMagic) * Math.cos(radLat) * PI);
-    return { longitude: lng + dLng, latitude: lat + dLat };
+    const rLng = lng + dLng;
+    const rLat = lat + dLat;
+
+    return {
+        longitude: truncateDecimals(rLng, decimals),
+        latitude: truncateDecimals(rLat, decimals),
+    };
 }
