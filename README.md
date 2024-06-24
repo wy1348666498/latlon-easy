@@ -51,7 +51,7 @@ const { bd09ToGcj02, getBearing } = require("latlon-easy");
 
 ## `gcj02ToWgs84(longitude, latitude, decimals)`
 
-将 GCJ-02（火星）坐标系的坐标转换为 WGS-84 坐标系。
+将 GCJ-02（火星）坐标系的坐标转换为 WGS-84 坐标系。(中国国内坐标才需要转换)
 
 - **参数：**
     - `longitude`：GCJ-02 坐标系中的经度。
@@ -63,7 +63,7 @@ const { bd09ToGcj02, getBearing } = require("latlon-easy");
 
 ## `wgs84ToGcj02(longitude, latitude, decimals)`
 
-将 WGS-84 坐标系的坐标转换为 GCJ-02（火星）坐标系。
+将 WGS-84 坐标系的坐标转换为 GCJ-02（火星）坐标系。(中国国内坐标才需要转换)
 
 - **参数：**
     - `longitude`：WGS-84 坐标系中的经度。
